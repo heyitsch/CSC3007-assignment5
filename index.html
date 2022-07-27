@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Assignment 5</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.8.0/leaflet.css" />
+    <style>
+       #map {
+        width: 1000px;
+        height: 600px;
+      }
+      .leaflet-tooltip-pane .tooltip {
+        color: #FDDA0D;
+        font-weight: bold;
+        font-size: 2.5em;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.8.0/leaflet.js"></script>
+    <script>
+      const api_call = 'https://api.data.gov.sg/v1/environment/psi'
+
+      async function getData(api_call) {
+      const response = await fetch(api_call);
+      var data = await response.json();
+    
+      // get all latitude and longitude
+      let westLatitude = data.region_metadata[0].label_location.latitude;
+      let westLongitude = data.region_metadata[0].label_location.longitude;
+
+      let eastLatitude = data.region_metadata[2].label_location.latitude;
+      let eastLongitude = data.region_metadata[2].label_location.longitude;
+
+      let centralLatitude = data.region_metadata[3].label_location.latitude;
+      let centralLongitude = data.region_metadata[3].label_location.longitude;
+
+      let southLatitude = data.region_metadata[4].label_location.latitude;
+      let southLongitude = data.region_metadata[4].label_location.longitude;
+
+      let northLatitude = data.region_metadata[5].label_location.latitude;
+      let northLongitude = data.region_metadata[5].label_location.longitude;
+
+      // get all 24hr psi_twenty_four_hourly reading
+      let west_psi = data.items[0].readings.psi_twenty_four_hourly.west;
+      let national_psi = data.items[0].readings.psi_twenty_four_hourly.national;
+      let east_psi = data.items[0].readings.psi_twenty_four_hourly.east;
+      let central_psi = data.items[0].readings.psi_twenty_four_hourly.west;
+      let south_psi = data.items[0].readings.psi_twenty_four_hourly.south;
+      let north_psi = data.items[0].readings.psi_twenty_four_hourly.north;
+
+      // add circle
+      var west_circle = L.circle([westLatitude, westLongitude], {
+        color: 'green',
+        fillColor: '#A7F1A7',
+        fillOpacity: 0.5,
+        radius: west_psi * 50
+      }).addTo(map);
+
+      var east_circle = L.circle([eastLatitude, eastLongitude], {
+        color: 'green',
+        fillColor: '#A7F1A7',
+        fillOpacity: 0.5,
+        radius: east_psi * 50
+      }).addTo(map);
+
+      var central_circle = L.circle([centralLatitude, centralLongitude], {
+        color: 'green',
+        fillColor: '#A7F1A7',
+        fillOpacity: 0.5,
+        radius: central_psi * 50
+      }).addTo(map);
+
+      var south_circle = L.circle([southLatitude, southLongitude], {
+        color: 'green',
+        fillColor: '#A7F1A7',
+        fillOpacity: 0.5,
+        radius: south_psi * 50
+      }).addTo(map);
+
+      var north_circle = L.circle([northLatitude, northLongitude], {
+        color: 'green',
+        fillColor: '#A7F1A7',
+        fillOpacity: 0.5,
+        radius: north_psi * 50
+      }).addTo(map);
+
+      var west_tooltip = L.tooltip({
+        permanent: true,
+        direction: 'center',
+        className: 'tooltip'
+      }).setContent(`${west_psi}`).setLatLng([westLatitude, westLongitude]).addTo(map);
+
+      var east_tooltip = L.tooltip({
+        permanent: true,
+        direction: 'center',
+        className: 'tooltip'
+      }).setContent(`${east_psi}`).setLatLng([eastLatitude, eastLongitude]).addTo(map);
+
+      var central_tooltip = L.tooltip({
+        permanent: true,
+        direction: 'center',
+        className: 'tooltip'
+      }).setContent(`${central_psi}`).setLatLng([centralLatitude, centralLongitude]).addTo(map);
+
+      var south_tooltip = L.tooltip({
+        permanent: true,
+        direction: 'center',
+        className: 'tooltip'
+      }).setContent(`${south_psi}`).setLatLng([southLatitude, southLongitude]).addTo(map);
+
+      var north_tooltip = L.tooltip({
+        permanent: true,
+        direction: 'center',
+        className: 'tooltip'
+      }).setContent(`${north_psi}`).setLatLng([northLatitude, northLongitude]).addTo(map);
+                
+      }
+
+      let tiles = L.tileLayer('https://maps-{s}.onemap.sg/v3/Default/{z}/{x}/{y}.png', {
+        detectRetina: true,
+        maxZoom: 18,
+        minZoom: 11,
+        //Do not remove this attribution
+        attribution: '<img src="https://www.onemap.gov.sg/docs/maps/images/oneMap64-01.png" style="height:20px;width:20px;"/> OneMap | Map data &copy; contributors, <a href="http://SLA.gov.sg">Singapore Land Authority</a>'
+      });
+
+      let map = new L.Map('map', { center: [1.347833, 103.809357], zoom: 12 })
+      .addLayer(tiles);
+      getData(api_call);
+    </script>
+  </body>
+</html>
